@@ -13,21 +13,20 @@ public class FlywayExample {
     public static void main(String[] args) {
 
         // Create our DataSource
-        HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl(JDBC_URL);
-        dataSource.setUsername(USERNAME);
-        dataSource.setPassword(PASSWORD);
-        dataSource.setDriverClassName(DRIVER);
+        try (HikariDataSource dataSource = new HikariDataSource()) {
+            dataSource.setJdbcUrl(JDBC_URL);
+            dataSource.setUsername(USERNAME);
+            dataSource.setPassword(PASSWORD);
+            dataSource.setDriverClassName(DRIVER);
 
-        // Create a Flyway configuration
-        FluentConfiguration configure = org.flywaydb.core.Flyway.configure();
-        configure.dataSource(dataSource);
-        configure.baselineOnMigrate(true);  // Used when applying Flyway to an existing database
-        configure.table("schema_version");  // Name of schema version tracking table
+            // Create a Flyway configuration
+            FluentConfiguration configure = org.flywaydb.core.Flyway.configure();
+            configure.dataSource(dataSource);
+            configure.baselineOnMigrate(true);  // Used when applying Flyway to an existing database
+            configure.table("schema_version");  // Name of schema version tracking table
 
-        // Run migration
-        Flyway flyway = new Flyway(configure);
-        try {
+            // Run migration
+            Flyway flyway = new Flyway(configure);
             System.out.println("Running database migrations ...");
             flyway.repair();            // Repair checksums, history, failed migrations, etc.
             flyway.migrate();           // Apply any scripts not in the schema version table
@@ -35,6 +34,5 @@ public class FlywayExample {
         } catch (FlywayException e) {
             e.printStackTrace();
         }
-
     }
 }
